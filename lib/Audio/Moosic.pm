@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.06;
+$VERSION = 0.07;
 
 =head1 NAME
 
@@ -707,22 +707,6 @@ sub pause {
 	return $self->call('pause');
 }
 
-=head2 play
-
-  $moo->play();
-
-Start playing. If the playback is paused it will be unpaused. If the queue is
-stopped it will be started.
-
-=cut
-
-sub play {
-	my $self = shift;
-
-	return $self->unpause() if $self->is_paused();
-	return $self->run_queue();
-}
-
 =head2 prepend
 
   $moo->prepend('foo.ogg', 'bar.mp3');
@@ -1176,6 +1160,50 @@ sub version {
 	return $self->call('version');
 }
 
+=head1 HELPER METHODS
+
+The following methods aren't methods defined by the moosic API but should be
+usefull when dealing with a moosic server.
+
+=head2 play
+
+  $moo->play();
+
+Start playing. If the playback is paused it will be unpaused. If the queue is
+stopped it will be started.
+
+=cut
+
+sub play {
+	my $self = shift;
+
+	return $self->unpause() if $self->is_paused();
+	return $self->run_queue();
+}
+
+=head2 can_play
+
+  $moo->append( $song ) if $moo->can_play( $song );
+
+Takes a list of songs as argument and returns all items that can be played by
+the moosic daemon.
+
+=cut
+
+sub can_play {
+	my $self = shift;
+	my @can_play;
+
+	my @config = $self->getconfig();
+	for my $track ( @_ ) {
+		for( @config ) {
+			push @can_play, $track if $track =~ qr/$_->[0]/;
+		}
+	}
+
+	return @can_play;
+}
+
 package Audio::Moosic::Inet;
 
 use strict;
@@ -1199,6 +1227,7 @@ package Audio::Moosic::Unix;
 use strict;
 use warnings;
 use base qw( Audio::Moosic );
+
 
 sub connect {
 	_init();

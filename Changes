@@ -1,5 +1,8 @@
 Revision history for Perl extension Audio::Moosic.
 
+0.07  Tue Sep 14 21:23:08 2004
+	- Added can_play().
+
 0.06  Mon Sep 13 12:48:22 2004
 	- Fixed bug with set_loop_mode().
 	- Added play().
