@@ -1,0 +1,6 @@
+Revision history for Perl extension Audio::Moosic.
+
+0.01  Sun Jun  6 19:21:53 2004
+	- original version; created by h2xs 1.23 with options
+		-AXO -n Audio::Moosic
+
