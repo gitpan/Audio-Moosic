@@ -1,5 +1,8 @@
 Revision history for Perl extension Audio::Moosic.
 
+0.02  Thu Jul 15 04:18:20 2004
+	- LWP::Protocol::http::UNIX is now known as LWP::Protocol::http::UnixSocket
+
 0.01  Sun Jun  6 19:21:53 2004
 	- original version; created by h2xs 1.23 with options
 		-AXO -n Audio::Moosic

@@ -14,8 +14,8 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-LWP::Protocol::http::UNIX (only if you need to communicate with a local moosic
-server over an UNIX socket.
+LWP::Protocol::http::UnixSocket (only if you need to communicate with a local
+moosic server over an UNIX socket.
 
 COPYRIGHT AND LICENCE
 

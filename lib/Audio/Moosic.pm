@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.01;
+$VERSION = 0.02;
 
 =head1 NAME
 
@@ -908,15 +908,14 @@ sub showconfig {
 	return $config unless wantarray;
 
 	my @config;
-	foreach( split("\n", $config) ) {
+	foreach(split("\n", $config)) {
 		s/^\s+//;
 		chomp;
-		push @config, $_;
+		push(@config, $_);
 	}
 
 	return @config;
 }
-
 
 =head2 shuffle
 
@@ -1168,6 +1167,7 @@ use vars qw( @ISA $VERSION );
 
 @ISA = qw( Audio::Moosic );
 
+
 sub connect {
 	_init();
 
@@ -1185,21 +1185,29 @@ sub connect {
 
 sub _init {
 
-	unless( eval 'require LWP::Protocol::http::UNIX' ) {
+	unless( eval 'require LWP::Protocol::http::UnixSocket' ) {
 		require Carp;
-		Carp::croak('You need LWP::Protocol::http::UNIX to connect to a local'.
-				" moosic server using an UNIX socket.\nPlease install it!");
+		Carp::croak('You need LWP::Protocol::http::UnixSocket to connect to a local'.
+				" moosic server using a UNIX socket.\nPlease install it!");
 	}
 	
-	LWP::Protocol::implementor( http => 'LWP::Protocol::http::UNIX' );
+	LWP::Protocol::implementor( http => 'LWP::Protocol::http::UnixSocket' );
 }
 
 1;
 
 =head1 BUGS
 
-If you find a bug please report it to Florian Ragwitz
-E<lt>florian@mookooh.orgE<gt>.
+=over 4
+
+=item * check arguments more strictly
+
+expecially for constructors.
+
+=back
+
+If you find some others please report them to Florian Ragwitz
+E<lt>florian@mookooh.orgE<gt>
 
 =head1 TODO
 
@@ -1212,10 +1220,6 @@ E<lt>florian@mookooh.orgE<gt>.
 =item * maybe use autoloader to load subs on demand
 
 create the method arguments from methodSignature.
-
-=item * check arguments more strictly
-
-expecially for constructors
 
 =back
 
