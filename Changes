@@ -1,5 +1,9 @@
 Revision history for Perl extension Audio::Moosic.
 
+0.03  THu Jul 15 09:35:34 2004
+	- LWP::Protocol::http::SocketUnix is the new name included in the module
+	  list.
+
 0.02  Thu Jul 15 04:18:20 2004
 	- LWP::Protocol::http::UNIX is now known as LWP::Protocol::http::UnixSocket
 

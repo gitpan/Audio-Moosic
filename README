@@ -1,4 +1,4 @@
-Audio-Moosic version 0.01
+Audio-Moosic version 0.03
 =========================
 
 INSTALLATION
@@ -14,7 +14,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-LWP::Protocol::http::UnixSocket (only if you need to communicate with a local
+LWP::Protocol::http::SocketUnix (only if you need to communicate with a local
 moosic server over an UNIX socket.
 
 COPYRIGHT AND LICENCE

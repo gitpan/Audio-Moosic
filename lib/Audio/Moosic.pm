@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 =head1 NAME
 
@@ -1185,13 +1185,13 @@ sub connect {
 
 sub _init {
 
-	unless( eval 'require LWP::Protocol::http::UnixSocket' ) {
+	unless( eval 'require LWP::Protocol::http::SocketUnix' ) {
 		require Carp;
-		Carp::croak('You need LWP::Protocol::http::UnixSocket to connect to a local'.
+		Carp::croak('You need LWP::Protocol::http::SocketUnix to connect to a local'.
 				" moosic server using a UNIX socket.\nPlease install it!");
 	}
 	
-	LWP::Protocol::implementor( http => 'LWP::Protocol::http::UnixSocket' );
+	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnix' );
 }
 
 1;
@@ -1207,7 +1207,7 @@ expecially for constructors.
 =back
 
 If you find some others please report them to Florian Ragwitz
-E<lt>florian@mookooh.orgE<gt>
+E<lt>flora@cpan.orgE<gt>
 
 =head1 TODO
 
@@ -1229,7 +1229,7 @@ moosic(1), moosicd(1), http://nanoo.org/~daniel/moosic/
 
 =head1 AUTHOR
 
-Florian Ragwitz, E<lt>florian@mookooh.orgE<gt>
+Florian Ragwitz, E<lt>flora@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
