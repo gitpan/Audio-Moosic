@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 =head1 NAME
 
@@ -1025,6 +1025,25 @@ sub sub_all {
 	);
 }
 
+=head2 swap
+
+  $moo->swap( [7, 10], [ 5 ]  );
+
+Swap the items contained in one range with the items contained in the other
+range. The ranges for the swap() method needs to be passed as array references
+in contrast to other methods that use ranges.
+
+=cut
+
+sub swap {
+	my ($self, $range1, $range2) = @_;
+
+	return $self->call('swap',
+			RPC::XML::array->new( map { RPC::XML::int->new($_) } @{$range1} ),
+			RPC::XML::array->new( map { RPC::XML::int->new($_) } @{$range2} )
+	);
+}
+
 =head2 listMethods
 
   @methods = $moo->listMethods;
@@ -1143,9 +1162,7 @@ package Audio::Moosic::Inet;
 
 use strict;
 use warnings;
-use vars qw( @ISA );
-
-@ISA = qw( Audio::Moosic );
+use base qw( Audio::Moosic );
 
 sub connect {
 	my ($self, $host, $port) = @_;
@@ -1163,9 +1180,7 @@ package Audio::Moosic::Unix;
 
 use strict;
 use warnings;
-use vars qw( @ISA $VERSION );
-
-@ISA = qw( Audio::Moosic );
+use base qw( Audio::Moosic );
 
 
 sub connect {

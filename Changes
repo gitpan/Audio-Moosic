@@ -1,6 +1,9 @@
 Revision history for Perl extension Audio::Moosic.
 
-0.03  THu Jul 15 09:35:34 2004
+0.04  Thu Aug 19 13:26:12 2004
+	- Added swap method introduced my moosic 1.5.1 (api version 1.8).
+
+0.03  Thu Jul 15 09:35:34 2004
 	- LWP::Protocol::http::SocketUnix is the new name included in the module
 	  list.
 
