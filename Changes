@@ -1,5 +1,9 @@
 Revision history for Perl extension Audio::Moosic.
 
+0.06  Mon Sep 13 12:48:22 2004
+	- Fixed bug with set_loop_mode().
+	- Added play().
+
 0.05  Fri Aug 20 12:41:03 2004
 	- Don't croak anymore if the connect failed. Simply set $@ and return an
 	  undefined value.

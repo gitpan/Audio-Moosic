@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.05;
+$VERSION = 0.06;
 
 =head1 NAME
 
@@ -707,6 +707,22 @@ sub pause {
 	return $self->call('pause');
 }
 
+=head2 play
+
+  $moo->play();
+
+Start playing. If the playback is paused it will be unpaused. If the queue is
+stopped it will be started.
+
+=cut
+
+sub play {
+	my $self = shift;
+
+	return $self->unpause() if $self->is_paused();
+	return $self->run_queue();
+}
+
 =head2 prepend
 
   $moo->prepend('foo.ogg', 'bar.mp3');
@@ -887,7 +903,7 @@ Turn loop mode on or off.
 sub set_loop_mode {
 	my ($self, $mode) = @_;
 	
-	return $self->call('set_loop_mode', RPC::XML::bool->new( $mode ));
+	return $self->call('set_loop_mode', RPC::XML::boolean->new( $mode ));
 }
 
 =head2 showconfig
@@ -1183,7 +1199,6 @@ package Audio::Moosic::Unix;
 use strict;
 use warnings;
 use base qw( Audio::Moosic );
-
 
 sub connect {
 	_init();
