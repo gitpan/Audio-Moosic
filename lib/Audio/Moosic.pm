@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.08;
+$VERSION = 0.09;
 
 =head1 NAME
 
@@ -607,21 +607,27 @@ sub length {
 
 =head2 list
 
-  @list = $moo->list;
+  @list = $moo->list();
   @list = $moo->list(2);
   @list = $moo->list(4, 8);
+  $list_ref = $moo->list()
 
 List the song queue's contents. If a range is specified, only the items that
-fall within that range are listed.
+fall within that range are listed. Returns an array if called in list context
+or an array reference if it's called in scalar context.
 
 =cut
 
 sub list {
 	my ($self, @range) = @_;
 
-	return $self->call('list', RPC::XML::array->new(
+	my $list = $self->call('list', RPC::XML::array->new(
 				map { RPC::XML::int->new($_) } @range
 	));
+
+	return wantarray ?
+		@{$list} :
+		$list;
 }
 
 =head2 move

@@ -5,7 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Audio::Moosic',
     VERSION_FROM      => 'lib/Audio/Moosic.pm', # finds $VERSION
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+		'RPC::XML'	=> 0
+	}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Audio/Moosic.pm', # retrieve abstract from module
        AUTHOR         => 'Florian Ragwitz <flora@cpan.org>') : ()),
