@@ -1,5 +1,10 @@
 Revision history for Perl extension Audio::Moosic.
 
+0.08  Wed Dez 15 15.10.03
+	- Documentation fix.
+	- Fixed fatal bugs in move() and move_list().
+	- Removed 'use 5.008004;' from Makefile.PL.
+
 0.07  Tue Sep 14 21:23:08 2004
 	- Added can_play().
 

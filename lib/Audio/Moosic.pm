@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.07;
+$VERSION = 0.08;
 
 =head1 NAME
 
@@ -196,7 +196,7 @@ sub error {
 =head2 call
 
   $moo->call('foo');
-  $moo->call('bar', RPC::XML::int(3));
+  $moo->call('bar', RPC::XML::int->new(3));
 
 This method calls a xml-rpc method on the moosic server. The first argument
 should be the method name. The arguments of that method should follow behind.
@@ -640,7 +640,7 @@ sub move {
 
 	return $self->call('move',
 			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range ),
-			RPC::XML::int( $num )
+			RPC::XML::int->new( $num )
 	);
 }
 
@@ -659,7 +659,7 @@ sub move_list {
 
 	return $self->call('move_list',
 			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range ),
-			RPC::XML::int( $num )
+			RPC::XML::int->new( $num )
 	);
 }
 
