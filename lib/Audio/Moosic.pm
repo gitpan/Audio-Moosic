@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.04;
+$VERSION = 0.05;
 
 =head1 NAME
 
@@ -47,6 +47,9 @@ Audio::Moosic::Inet instance you need to pass host and port as arguments.
 
 You can't create an instance of Audio::Moosic itself. Use Unix or Inet subclass.
 
+If the object was able to connect to the moosic server a reference to the object
+instance is returned. If the connection failed $@ is set and undef returned.
+
 =cut
 
 sub new {
@@ -57,8 +60,7 @@ sub new {
 	bless $self, $class;
 
 	unless( $self->connect(@args) ) {
-		require Carp;
-		Carp::croak "Can't connect to moosic server: $!";
+		$@ = "Can't connect to moosic server: $!";
 		return;
 	}
 

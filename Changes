@@ -1,7 +1,11 @@
 Revision history for Perl extension Audio::Moosic.
 
+0.05  Fri Aug 20 12:41:03 2004
+	- Don't croak anymore if the connect failed. Simply set $@ and return an
+	  undefined value.
+
 0.04  Thu Aug 19 13:26:12 2004
-	- Added swap method introduced my moosic 1.5.1 (api version 1.8).
+	- Added swap method introduced by moosic 1.5.1 (api version 1.8).
 
 0.03  Thu Jul 15 09:35:34 2004
 	- LWP::Protocol::http::SocketUnix is the new name included in the module
