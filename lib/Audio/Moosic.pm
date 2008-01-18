@@ -6,7 +6,7 @@ use vars qw( $VERSION );
 use RPC::XML;
 use RPC::XML::Client;
 
-$VERSION = 0.09;
+$VERSION = '0.10';
 
 =head1 NAME
 
@@ -53,18 +53,18 @@ instance is returned. If the connection failed $@ is set and undef returned.
 =cut
 
 sub new {
-	my ($class, @args) = @_;
-	$class = ref($class) || $class;
+    my ($class, @args) = @_;
+    $class = ref($class) || $class;
 
-	my $self = { __errors => [ ] };
-	bless $self, $class;
+    my $self = { __errors => [ ] };
+    bless $self, $class;
 
-	unless( $self->connect(@args) ) {
-		$@ = "Can't connect to moosic server: $!";
-		return;
-	}
+    unless( $self->connect(@args) ) {
+        $@ = "Can't connect to moosic server: $!";
+        return;
+    }
 
-	return $self;
+    return $self;
 }
 
 =head2 connect
@@ -77,9 +77,9 @@ moosic client.
 =cut
 
 sub connect {
-	require Carp;
-	Carp::croak('This method should never be called. Please create an instance'.
-			' of Audio::Moosic::Inet or Audio::Moosic::Unix.');
+    require Carp;
+    Carp::croak('This method should never be called. Please create an instance'.
+                ' of Audio::Moosic::Inet or Audio::Moosic::Unix.');
 }
 
 =head2 disconnect
@@ -92,9 +92,9 @@ after calling this method. You'll need to reconnect() first.
 =cut
 
 sub disconnect {
-	my $self = shift;
-	$self->{__connected} = 0;
-	delete $self->{__rpc_xml_client}
+    my $self = shift;
+    $self->{__connected} = 0;
+    delete $self->{__rpc_xml_client};
 }
 
 =head2 reconnect
@@ -106,9 +106,9 @@ Disconnects from the server if you're connected and tries to reconnect.
 =cut
 
 sub reconnect {
-	my $self = shift;
-	$self->disconnect if $self->connected;
-	return $self->connect;
+    my $self = shift;
+    $self->disconnect if $self->connected;
+    return $self->connect;
 }
 
 =head2 connected
@@ -120,8 +120,8 @@ Check whether you're connected to the moosic server or not.
 =cut
 
 sub connected {
-	my $self = shift;
-	return $self->{__connected};
+    my $self = shift;
+    return $self->{__connected};
 }
 
 =head2 client_config
@@ -138,12 +138,12 @@ Suggestions or maybe patches are welcome.
 =cut
 
 sub client_config {
-	my ($self, $key) = @_;
-	if($key) {
-		return $self->{__client_config}{$key};
-	} else {
-		return $self->{__client_config};
-	}
+    my ($self, $key) = @_;
+    if($key) {
+        return $self->{__client_config}{$key};
+    } else {
+        return $self->{__client_config};
+    }
 }
 
 =head2 ping
@@ -157,17 +157,17 @@ calling the no_op server method. connected() only checks the value of the
 =cut
 
 sub ping {
-	my $self = shift;
+    my $self = shift;
 
-	my $resp = $self->{__rpc_xml_client}->send_request('no_op');
+    my $resp = $self->{__rpc_xml_client}->send_request('no_op');
 
-	if( ref $resp ) {
-		$self->{__connected} = 1;
-	} else {
-		$self->{__connected} = 0;
-	}
+    if( ref $resp ) {
+        $self->{__connected} = 1;
+    } else {
+        $self->{__connected} = 0;
+    }
 
-	return $self->connected;
+    return $self->connected;
 }
 
 =head2 error
@@ -182,15 +182,15 @@ in list context the whole error array of the Audio::Moosic instance is returned.
 =cut
 
 sub error {
-	my ($self, $error) = @_;
+    my ($self, $error) = @_;
 
-	if($error) {
-		push(@{$self->{__errors}}, $error);
-	} else {
-		return wantarray ?
-			@{$self->{__errors}} :
-			@{$self->{__errors}}[@{$self->{__errors}} - 1];
-	}
+    if($error) {
+        push(@{$self->{__errors}}, $error);
+    } else {
+        return wantarray ?
+            @{$self->{__errors}} :
+            @{$self->{__errors}}[@{$self->{__errors}} - 1];
+    }
 }
 
 =head2 call
@@ -220,26 +220,26 @@ if that happens so I'll add the new method.
 =cut
 
 sub call {
-	my ($self, $method, @args) = @_;
-	return unless $self->connected;
-	my $resp = $self->{__rpc_xml_client}->send_request($method, @args);
+    my ($self, $method, @args) = @_;
+    return unless $self->connected;
+    my $resp = $self->{__rpc_xml_client}->send_request($method, @args);
 
-	unless( ref $resp ) {
-		my $error = qq/Lost connection to moosic server: "$resp"/;
-		if( my $function = (caller(1))[3]) { $error .= " in $function()"; }
-		$self->error($error);
-		$self->{__connected} = 0;
-		return;
-	}
+    unless( ref $resp ) {
+        my $error = qq/Lost connection to moosic server: "$resp"/;
+        if( my $function = (caller(1))[3]) { $error .= " in $function()"; }
+        $self->error($error);
+        $self->{__connected} = 0;
+        return;
+    }
 
-	if( $resp->is_fault ) {
-		my $error = 'Error: '. $resp->code .': "'. $resp->string .'"';
-		if( my $function = (caller(1))[3]) { $error .= " in $function()"; }
-		$self->error($error);
-		return;
-	}
+    if( $resp->is_fault ) {
+        my $error = 'Error: '. $resp->code .': "'. $resp->string .'"';
+        if( my $function = (caller(1))[3]) { $error .= " in $function()"; }
+        $self->error($error);
+        return;
+    }
 
-	return $resp->value;
+    return $resp->value;
 }
 
 =head2 api_version
@@ -254,9 +254,9 @@ the API version are returned.
 =cut
 
 sub api_version {
-	my $self = shift;
-	my $resp = $self->call('api_version') or return;
-	return wantarray ? @{$resp} : join('.', @{$resp});
+    my $self = shift;
+    my $resp = $self->call('api_version') or return;
+    return wantarray ? @{$resp} : join('.', @{$resp});
 }
 
 =head2 append
@@ -271,10 +271,10 @@ there were some.
 =cut
 
 sub append {
-	my ($self, @items) = @_;
-	return $self->call('append', RPC::XML::array->new(
-				map { RPC::XML::base64->new($_) } @items
-	));
+    my ($self, @items) = @_;
+    return $self->call('append', RPC::XML::array->new(
+                map { RPC::XML::base64->new($_) } @items
+    ));
 }
 
 =head2 clear
@@ -286,8 +286,8 @@ Clears the moosic queue. Only the current song remains playing.
 =cut
 
 sub clear {
-	my $self = shift;
-	return $self->call('clear');
+    my $self = shift;
+    return $self->call('clear');
 }
 
 =head2 crop
@@ -304,10 +304,10 @@ second integer.
 =cut
 
 sub crop {
-	my ($self, @range) = @_;
-	return $self->call('crop', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    my ($self, @range) = @_;
+    return $self->call('crop', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 crop_list
@@ -319,10 +319,10 @@ Remove all queued items exept those referenced by a list of positions.
 =cut
 
 sub crop_list {
-	my ($self, @range) = @_;
-	return $self->call('crop_list', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    my ($self, @range) = @_;
+    return $self->call('crop_list', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 current
@@ -334,8 +334,8 @@ Return the name of the current playing song.
 =cut
 
 sub current {
-	my $self = shift;
-	return $self->call('current');
+    my $self = shift;
+    return $self->call('current');
 }
 
 =head2 current_time
@@ -347,8 +347,8 @@ Return the amount of time the current song has been playing.
 =cut
 
 sub current_time {
-	my $self = shift;
-	return $self->call('current_time');
+    my $self = shift;
+    return $self->call('current_time');
 }
 
 =head2 cut
@@ -362,10 +362,10 @@ on how that range should look like.
 =cut
 
 sub cut {
-	my ($self, @range) = @_;
-	return $self->call('cut', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    my ($self, @range) = @_;
+    return $self->call('cut', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 cut_list
@@ -377,10 +377,10 @@ Remove all queued items referenced by list of positions.
 =cut
 
 sub cut_list {
-	my ($self, @range) = @_;
-	return $self->call('cut_list', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    my ($self, @range) = @_;
+    return $self->call('cut_list', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 die
@@ -392,8 +392,8 @@ Tell the server to terminate itself.
 =cut
 
 sub die {
-	my $self = shift;
-	($self->call('die') and $self->disconnect) or return;
+    my $self = shift;
+    ($self->call('die') and $self->disconnect) or return;
 }
 
 =head2 filter
@@ -408,11 +408,11 @@ this operation to a specific range which is described in crop().
 =cut
 
 sub filter {
-	my ($self, $regex, @range) = @_;
-	return $self->call('filter',
-			RPC::XML::base64->new($regex),
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
-	);
+    my ($self, $regex, @range) = @_;
+    return $self->call('filter',
+            RPC::XML::base64->new($regex),
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
+    );
 }
 
 =head2 get_history_limit
@@ -424,8 +424,8 @@ Get the limit on the size of the history list stored in servers memory.
 =cut
 
 sub get_history_limit {
-	my $self = shift;
-	return $self->call('get_history_limit');
+    my $self = shift;
+    return $self->call('get_history_limit');
 }
 
 =head2 getconfig
@@ -437,10 +437,10 @@ Return a list of the server's filetype-player associations.
 =cut
 
 sub getconfig {
-	my ($self, $key) = @_;
-	my $resp = $self->call('getconfig');
-	return @{$resp};
-	#TODO support $key to read single config options
+    my ($self, $key) = @_;
+    my $resp = $self->call('getconfig');
+    return @{$resp};
+    #TODO support $key to read single config options
 }
 
 =head2 halt_queue
@@ -452,8 +452,8 @@ Stop any new songs from being played. Use run_queue() to reverse this state.
 =cut
 
 sub halt_queue {
-	my $self = shift;
-	return $self->call('halt_queue');
+    my $self = shift;
+    return $self->call('halt_queue');
 }
 
 =head2 haltqueue
@@ -463,8 +463,8 @@ See halt_queue().
 =cut
 
 sub haltqueue {
-	my $self = shift;
-	$self->halt_queue;
+    my $self = shift;
+    $self->halt_queue;
 }
 
 =head2 history
@@ -485,13 +485,13 @@ history() returns an array of hashrefs like that:
 =cut
 
 sub history {
-	my ($self, $num) = @_;
+    my ($self, $num) = @_;
 
-	return map {
-		title	=> $_->[0],
-		start	=> $_->[1],
-		stop	=> $_->[2] }, @{$self->call('history',
-				RPC::XML::int->new( $num || 0 )) };
+    return map {
+        title    => $_->[0],
+        start    => $_->[1],
+        stop    => $_->[2] }, @{$self->call('history',
+                RPC::XML::int->new( $num || 0 )) };
 }
 
 =head2 indexed_list
@@ -512,11 +512,11 @@ indexed_list() returns a hash like that:
 =cut
 
 sub indexed_list {
-	my ($self, @range) = @_;
-	
-	return $self->call('indexed_list', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    my ($self, @range) = @_;
+
+    return $self->call('indexed_list', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 insert
@@ -528,14 +528,14 @@ Insert items at a given position in the queue.
 =cut
 
 sub insert {
-	my $self = shift;
-	my $num = pop;
-	my @items = @_;
+    my $self = shift;
+    my $num = pop;
+    my @items = @_;
 
-	return $self->call('insert',
-			RPC::XML::array->new( map { RPC::XML::base64->new($_) } @items ),
-			RPC::XML::int->new( $num )
-	);
+    return $self->call('insert',
+            RPC::XML::array->new( map { RPC::XML::base64->new($_) } @items ),
+            RPC::XML::int->new( $num )
+    );
 }
 
 =head2 is_looping
@@ -547,8 +547,8 @@ Check whether the loop mode is on or not.
 =cut
 
 sub is_looping {
-	my $self = shift;
-	return $self->call('is_looping');
+    my $self = shift;
+    return $self->call('is_looping');
 }
 
 =head2 is_paused
@@ -560,8 +560,8 @@ Check whether the current song is paused or not.
 =cut
 
 sub is_paused {
-	my $self = shift;
-	return $self->call('is_paused');
+    my $self = shift;
+    return $self->call('is_paused');
 }
 
 =head2 is_queue_running
@@ -575,8 +575,8 @@ Check whether the queue consumption (advancement) is activated.
 =cut
 
 sub is_queue_running {
-	my $self = shift;
-	return $self->call('is_queue_running');
+    my $self = shift;
+    return $self->call('is_queue_running');
 }
 
 =head2 last_queue_update
@@ -588,8 +588,8 @@ Return the time at which the song queue was last modified.
 =cut
 
 sub last_queue_update {
-	my $self = shift;
-	return $self->call('last_queue_update');
+    my $self = shift;
+    return $self->call('last_queue_update');
 }
 
 =head2 length
@@ -601,8 +601,8 @@ Return the number of items in the song queue.
 =cut
 
 sub length {
-	my $self = shift;
-	return $self->call('length');
+    my $self = shift;
+    return $self->call('length');
 }
 
 =head2 list
@@ -619,15 +619,15 @@ or an array reference if it's called in scalar context.
 =cut
 
 sub list {
-	my ($self, @range) = @_;
+    my ($self, @range) = @_;
 
-	my $list = $self->call('list', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    my $list = $self->call('list', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 
-	return wantarray ?
-		@{$list} :
-		$list;
+    return wantarray ?
+        @{$list} :
+        $list;
 }
 
 =head2 move
@@ -640,14 +640,14 @@ Move a range of items to a new position within the queue.
 =cut
 
 sub move {
-	my $self = shift;
-	my $num = pop;
-	my @range = @_;
+    my $self = shift;
+    my $num = pop;
+    my @range = @_;
 
-	return $self->call('move',
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range ),
-			RPC::XML::int->new( $num )
-	);
+    return $self->call('move',
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @range ),
+            RPC::XML::int->new( $num )
+    );
 }
 
 =head2 move_list
@@ -659,14 +659,14 @@ Move the items referenced by a list of positions to a new position.
 =cut
 
 sub move_list {
-	my $self = shift;
-	my $num = pop;
-	my @range = @_;
+    my $self = shift;
+    my $num = pop;
+    my @range = @_;
 
-	return $self->call('move_list',
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range ),
-			RPC::XML::int->new( $num )
-	);
+    return $self->call('move_list',
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @range ),
+            RPC::XML::int->new( $num )
+    );
 }
 
 =head2 next
@@ -682,9 +682,9 @@ method, except that it will have an effect even if nothing is currently playing.
 =cut
 
 sub next {
-	my ($self, $num) = @_;
+    my ($self, $num) = @_;
 
-	return $self->call('next', RPC::XML::int->new( $num || 1 ));
+    return $self->call('next', RPC::XML::int->new( $num || 1 ));
 }
 
 =head2 no_op
@@ -696,8 +696,8 @@ Do nothing, successfully.
 =cut
 
 sub no_op {
-	my $self = shift;
-	return $self->call('no_op');
+    my $self = shift;
+    return $self->call('no_op');
 }
 
 =head2 pause
@@ -709,8 +709,8 @@ Pause the currently playing song.
 =cut
 
 sub pause {
-	my $self = shift;
-	return $self->call('pause');
+    my $self = shift;
+    return $self->call('pause');
 }
 
 =head2 prepend
@@ -722,11 +722,11 @@ Add items to the beginning of the queue.
 =cut
 
 sub prepend {
-	my ($self, @items) = @_;
+    my ($self, @items) = @_;
 
-	return $self->call('prepend', RPC::XML::array->new(
-				map { RPC::XML::base64->new($_) } @items
-	));
+    return $self->call('prepend', RPC::XML::array->new(
+                map { RPC::XML::base64->new($_) } @items
+    ));
 }
 
 =head2 previous
@@ -742,9 +742,9 @@ played songs in the history.
 =cut
 
 sub previous {
-	my ($self, $num) = @_;
+    my ($self, $num) = @_;
 
-	return $self->call('previous', RPC::XML::int->new( $num || 1 ));
+    return $self->call('previous', RPC::XML::int->new( $num || 1 ));
 }
 
 =head2 putback
@@ -756,8 +756,8 @@ Place the currently playing song at the beginning of the queue.
 =cut
 
 sub putback {
-	my $self = shift;
-	return $self->call('putback');
+    my $self = shift;
+    return $self->call('putback');
 }
 
 =head2 queue_length
@@ -769,8 +769,8 @@ Return the number of items in the song queue.
 =cut
 
 sub queue_length {
-	my $self = shift;
-	return $self->call('queue_length');
+    my $self = shift;
+    return $self->call('queue_length');
 }
 
 =head2 reconfigure
@@ -782,8 +782,8 @@ Tell the server to reread its player configuration file.
 =cut
 
 sub reconfigure {
-	my $self = shift;
-	return $self->call('reconfigure');
+    my $self = shift;
+    return $self->call('reconfigure');
 }
 
 =head2 remove
@@ -798,12 +798,12 @@ operation by giving a range as described in crop() as last argument.
 =cut
 
 sub remove {
-	my ($self, $regex, @range) = @_;
+    my ($self, $regex, @range) = @_;
 
-	return $self->call('remove',
-			RPC::XML::base64->new( $regex ),
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
-	);
+    return $self->call('remove',
+            RPC::XML::base64->new( $regex ),
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
+    );
 }
 
 =head2 replace
@@ -817,11 +817,11 @@ atomic.
 =cut
 
 sub replace {
-	my ($self, @items) = @_;
+    my ($self, @items) = @_;
 
-	return $self->call('replace', RPC::XML::array->new(
-				map { RPC::XML::base64->new($_) } @items
-	));
+    return $self->call('replace', RPC::XML::array->new(
+                map { RPC::XML::base64->new($_) } @items
+    ));
 }
 
 =head2 reverse
@@ -836,11 +836,11 @@ giving a range as described in crop() as last argument.
 =cut
 
 sub reverse {
-	my ($self, @range) = @_;
+    my ($self, @range) = @_;
 
-	return $self->call('reverse', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    return $self->call('reverse', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 run_queue
@@ -852,8 +852,8 @@ Allows new songs to be played again after halt_queue() has been called.
 =cut
 
 sub run_queue {
-	my $self = shift;
-	return $self->call('run_queue');
+    my $self = shift;
+    return $self->call('run_queue');
 }
 
 =head2 runqueue
@@ -863,8 +863,8 @@ See run_queue().
 =cut
 
 sub runqueue {
-	my $self = shift;
-	return $self->run_queue;
+    my $self = shift;
+    return $self->run_queue;
 }
 
 =head2 set_history_limit
@@ -876,9 +876,9 @@ Set the limit on the size of the history list stored in memory.
 =cut
 
 sub set_history_limit {
-	my ($self, $limit) = @_;
+    my ($self, $limit) = @_;
 
-	return $self->call('set_history_limit', RPC::XML::int->new( $limit ));
+    return $self->call('set_history_limit', RPC::XML::int->new( $limit ));
 }
 
 =head2 set_loop_mode
@@ -891,9 +891,9 @@ Turn loop mode on or off.
 =cut
 
 sub set_loop_mode {
-	my ($self, $mode) = @_;
-	
-	return $self->call('set_loop_mode', RPC::XML::boolean->new( $mode ));
+    my ($self, $mode) = @_;
+
+    return $self->call('set_loop_mode', RPC::XML::boolean->new( $mode ));
 }
 
 =head2 showconfig
@@ -909,20 +909,20 @@ configuration regular expression to the player commands is returned.
 =cut
 
 sub showconfig {
-	my $self = shift;
+    my $self = shift;
 
-	my $config = $self->call('showconfig');
-	return unless $config;
-	return $config unless wantarray;
+    my $config = $self->call('showconfig');
+    return unless $config;
+    return $config unless wantarray;
 
-	my @config;
-	foreach(split("\n", $config)) {
-		s/^\s+//;
-		chomp;
-		push(@config, $_);
-	}
+    my @config;
+    foreach(split("\n", $config)) {
+        s/^\s+//;
+        chomp;
+        push(@config, $_);
+    }
 
-	return @config;
+    return @config;
 }
 
 =head2 shuffle
@@ -937,11 +937,11 @@ operation by giving a range as described for crop() as last argument.
 =cut
 
 sub shuffle {
-	my ($self, @range) = @_;
+    my ($self, @range) = @_;
 
-	return $self->call('shuffle', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    return $self->call('shuffle', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 skip
@@ -954,8 +954,8 @@ has an effect if there actually is a current song.
 =cut
 
 sub skip {
-	my $self = shift;
-	return $self->call('skip');
+    my $self = shift;
+    return $self->call('skip');
 }
 
 =head2 sort
@@ -969,11 +969,11 @@ Arrange the contents of the queue into sorted order.
 =cut
 
 sub sort {
-	my ($self, @range) = @_;
+    my ($self, @range) = @_;
 
-	return $self->call('sort', RPC::XML::array->new(
-				map { RPC::XML::int->new($_) } @range
-	));
+    return $self->call('sort', RPC::XML::array->new(
+                map { RPC::XML::int->new($_) } @range
+    ));
 }
 
 =head2 stop
@@ -988,8 +988,8 @@ the song queue when it is stopped.
 =cut
 
 sub stop {
-	my $self = shift;
-	return $self->call('stop');
+    my $self = shift;
+    return $self->call('stop');
 }
 
 =head2 sub
@@ -1004,13 +1004,13 @@ limit this operation by giving a range as described for crop() as last argument.
 =cut
 
 sub sub {
-	my ($self, $regex, $subst, @range) = @_;
+    my ($self, $regex, $subst, @range) = @_;
 
-	return $self->call('sub',
-			RPC::XML::base64->new( $regex ),
-			RPC::XML::base64->new( $subst ),
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
-	);
+    return $self->call('sub',
+            RPC::XML::base64->new( $regex ),
+            RPC::XML::base64->new( $subst ),
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
+    );
 }
 
 =head2 sub_all
@@ -1024,13 +1024,13 @@ Performs a global regular expression substitution on the items in the queue.
 =cut
 
 sub sub_all {
-	my ($self, $regex, $subst, @range) = @_;
+    my ($self, $regex, $subst, @range) = @_;
 
-	return $self->call('sub_all',
-			RPC::XML::base64->new( $regex ),
-			RPC::XML::base64->new( $subst ),
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
-	);
+    return $self->call('sub_all',
+            RPC::XML::base64->new( $regex ),
+            RPC::XML::base64->new( $subst ),
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @range )
+    );
 }
 
 =head2 swap
@@ -1044,12 +1044,12 @@ in contrast to other methods that use ranges.
 =cut
 
 sub swap {
-	my ($self, $range1, $range2) = @_;
+    my ($self, $range1, $range2) = @_;
 
-	return $self->call('swap',
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @{$range1} ),
-			RPC::XML::array->new( map { RPC::XML::int->new($_) } @{$range2} )
-	);
+    return $self->call('swap',
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @{$range1} ),
+            RPC::XML::array->new( map { RPC::XML::int->new($_) } @{$range2} )
+    );
 }
 
 =head2 listMethods
@@ -1061,8 +1061,8 @@ Return an array of all available XML-RPC methods on this server.
 =cut
 
 sub listMethods {
-	my $self = shift;
-	return $self->call('system.listMethods');
+    my $self = shift;
+    return $self->call('system.listMethods');
 }
 
 =head2 methodHelp
@@ -1074,11 +1074,11 @@ Given the name of a method, return a help string.
 =cut
 
 sub methodHelp {
-	my ($self, $method) = @_;
+    my ($self, $method) = @_;
 
-	return $self->call('syste.methodHelp',
-			RPC::XML::string->new( $method )
-	);
+    return $self->call('syste.methodHelp',
+            RPC::XML::string->new( $method )
+    );
 }
 
 =head2 methodSignature
@@ -1092,11 +1092,11 @@ any others items are parameter types.  =cut
 =cut
 
 sub methodSignature {
-	my ($self, $method) = @_;
-	
-	return $self->call('system.methodSignature',
-			RPC::XML::string->new( $method )
-	);
+    my ($self, $method) = @_;
+
+    return $self->call('system.methodSignature',
+            RPC::XML::string->new( $method )
+    );
 }
 
 =head2 multicall
@@ -1109,9 +1109,9 @@ implemented yet.
 =cut
 
 sub multicall {
-	my ($self, @cmds) = @_;
-	require Carp;
-	Carp::carp(__PACKAGE__."::multicall() isn't implemented yet."); #TODO
+    my ($self, @cmds) = @_;
+    require Carp;
+    Carp::carp(__PACKAGE__."::multicall() isn't implemented yet."); #TODO
 }
 
 =head2 toggle_loop_mode
@@ -1123,8 +1123,8 @@ Turn loop mode on if it is off, and turns it off if it is on.
 =cut
 
 sub toggle_loop_mode {
-	my $self = shift;
-	return $self->call('toggle_loop_mode');
+    my $self = shift;
+    return $self->call('toggle_loop_mode');
 }
 
 =head2 toggle_pause
@@ -1136,8 +1136,8 @@ Pause the current song if it is playing, and unpauses if it is paused.
 =cut
 
 sub toggle_pause {
-	my $self = shift;
-	return $self->call('toggle_pause');
+    my $self = shift;
+    return $self->call('toggle_pause');
 }
 
 =head2 unpause
@@ -1149,8 +1149,8 @@ Unpauses the current song.
 =cut
 
 sub unpause {
-	my $self = shift;
-	return $self->call('unpause');
+    my $self = shift;
+    return $self->call('unpause');
 }
 
 =head2 version
@@ -1162,8 +1162,8 @@ Return the Moosic server's version string.
 =cut
 
 sub version {
-	my $self = shift;
-	return $self->call('version');
+    my $self = shift;
+    return $self->call('version');
 }
 
 =head1 HELPER METHODS
@@ -1181,10 +1181,10 @@ stopped it will be started.
 =cut
 
 sub play {
-	my $self = shift;
+    my $self = shift;
 
-	return $self->unpause() if $self->is_paused();
-	return $self->run_queue();
+    return $self->unpause() if $self->is_paused();
+    return $self->run_queue();
 }
 
 =head2 can_play
@@ -1197,17 +1197,17 @@ the moosic daemon.
 =cut
 
 sub can_play {
-	my $self = shift;
-	my @can_play;
+    my $self = shift;
+    my @can_play;
 
-	my @config = $self->getconfig();
-	for my $track ( @_ ) {
-		for( @config ) {
-			push @can_play, $track if $track =~ qr/$_->[0]/;
-		}
-	}
+    my @config = $self->getconfig();
+    for my $track ( @_ ) {
+        for( @config ) {
+            push @can_play, $track if $track =~ qr/$_->[0]/;
+        }
+    }
 
-	return @can_play;
+    return @can_play;
 }
 
 package Audio::Moosic::Inet;
@@ -1217,15 +1217,15 @@ use warnings;
 use base qw( Audio::Moosic );
 
 sub connect {
-	my ($self, $host, $port) = @_;
-	return if $self->connected;
+    my ($self, $host, $port) = @_;
+    return if $self->connected;
 
-	my $location = "http://$host\:$port";
-	$self->disconnect;
-	$self->{__rpc_xml_client} =	RPC::XML::Client->new($location);
+    my $location = "http://$host\:$port";
+    $self->disconnect;
+    $self->{__rpc_xml_client} =    RPC::XML::Client->new($location);
 
-	$self->ping or return;
-	$self->{__client_config} = { location => $location };
+    $self->ping or return;
+    $self->{__client_config} = { location => $location };
 }
 
 package Audio::Moosic::Unix;
@@ -1236,29 +1236,29 @@ use base qw( Audio::Moosic );
 
 
 sub connect {
-	_init();
+    _init();
 
-	my ($self, $filename) = @_;
-	return if $self->connected;
+    my ($self, $filename) = @_;
+    return if $self->connected;
 
-	$filename = ($ENV{HOME} || '/tmp') . '/.moosic/socket' unless $filename;
-	my $location  = "http://$filename";
-	$self->disconnect;
-	$self->{__rpc_xml_client} = RPC::XML::Client->new($location);
+    $filename = ($ENV{HOME} || '/tmp') . '/.moosic/socket' unless $filename;
+    my $location  = "http://$filename";
+    $self->disconnect;
+    $self->{__rpc_xml_client} = RPC::XML::Client->new($location);
 
-	$self->ping or return;
-	$self->{__client_config} = { location => $location };
+    $self->ping or return;
+    $self->{__client_config} = { location => $location };
 }
 
 sub _init {
 
-	unless( eval 'require LWP::Protocol::http::SocketUnix' ) {
-		require Carp;
-		Carp::croak('You need LWP::Protocol::http::SocketUnix to connect to a local'.
-				" moosic server using a UNIX socket.\nPlease install it!");
-	}
-	
-	LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnix' );
+    unless( eval 'require LWP::Protocol::http::SocketUnix' ) {
+        require Carp;
+        Carp::croak('You need LWP::Protocol::http::SocketUnix to connect to a local'.
+                " moosic server using a UNIX socket.\nPlease install it!");
+    }
+
+    LWP::Protocol::implementor( http => 'LWP::Protocol::http::SocketUnix' );
 }
 
 1;
@@ -1296,11 +1296,11 @@ moosic(1), moosicd(1), http://nanoo.org/~daniel/moosic/
 
 =head1 AUTHOR
 
-Florian Ragwitz, E<lt>flora@cpan.orgE<gt>
+Florian Ragwitz E<lt>rafl@debian.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004 by Florian Ragwitz
+Copyright (C) 2004-2008 by Florian Ragwitz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
